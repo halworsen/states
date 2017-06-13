@@ -23,9 +23,6 @@ states.states = {}
 CURRENT_STATE = CURRENT_STATE or ""
 
 states.hooks = states.hooks or {}
-for k,game_state in pairs(states.states) do
-	states.hooks[game_state] = {}
-end
 
 if SERVER then
 	util.AddNetworkString("States_Stateswitch")
@@ -42,6 +39,8 @@ function states.init()
 
 	for k,game_state in pairs(found_dirs) do
 		table.Add(states.states, game_state)
+		states.hooks[game_state] = {}
+
 		local folder_path = path.."/"..game_state
 
 		-- because this is called from the gamemode init files, the include will be relative to the "root" gamemode folder
