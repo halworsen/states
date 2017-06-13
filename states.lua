@@ -19,11 +19,7 @@ for k,v in pairs(GM or GAMEMODE) do
 	end
 end
 
-states.states = {
-	"pregame",
-	"playing",
-	"endgame"
-}
+states.states = {}
 CURRENT_STATE = CURRENT_STATE or ""
 
 states.hooks = states.hooks or {}
@@ -32,66 +28,63 @@ for k,game_state in pairs(states.states) do
 end
 
 if SERVER then
-	util.AddNetworkString("Statemachine_Stateswitch")
+	util.AddNetworkString("States_Stateswitch")
 end
 
 --[[
 	Statemachine functions
 --]]
 
-function states.load_state_files()
-	local path = "gamemodes/"..engine.ActiveGamemode().."/gamemode/statemachine/states"
+function states.init()
+	local path = "gamemodes/"..engine.ActiveGamemode().."/gamemode/states"
 
-	for k,game_state in pairs(states.states) do
+	local found_files, found_dirs = file.Find("*", path.."/")
+
+	for k,game_state in pairs(found_dirs) do
+		table.Add(states.states, game_state)
 		local folder_path = path.."/"..game_state
 
-		-- because this is called from the init files, the include will be relative to the "root" gamemode folder
-		local include_path = "statemachine/states/"..game_states.."/"
+		-- because this is called from the gamemode init files, the include will be relative to the "root" gamemode folder
+		local include_path = "states/"..game_state.."/"
 
 		if SERVER then
-			assert(file.Exists(path, "GAME"), "states folder doesn't exist")
-			assert(file.Exists(folder_path, "GAME"), "folder for gamestate "..game_states.." doesn't exist")
+			assert(file.Exists(path, "GAME"), "[states] states folder doesn't exist")
+			assert(file.Exists(folder_path, "GAME"), "[states] folder for gamestate "..game_state.." doesn't exist")
 
 			-- add shared file for clients
-			if file.Exists(folder_path.."/sh_"..game_states..".lua", "GAME") then
-				AddCSLuaFile(include_path.."sh_"..game_states..".lua")
-				--print("added state file sh_"..game_states..".lua to client")
+			if file.Exists(folder_path.."/sh_"..game_state..".lua", "GAME") then
+				AddCSLuaFile(include_path.."sh_"..game_state..".lua")
+				--print("added state file sh_"..game_state..".lua to client")
 			end
 			
 			-- add client file for clients
-			if file.Exists(folder_path.."/cl_"..game_states..".lua", "GAME") then
-				AddCSLuaFile(include_path.."cl_"..game_states..".lua")
-				--print("added state file cl_"..game_states..".lua to client")
+			if file.Exists(folder_path.."/cl_"..game_state..".lua", "GAME") then
+				AddCSLuaFile(include_path.."cl_"..game_state..".lua")
+				--print("added state file cl_"..game_state..".lua to client")
 			end
 
 			-- include sv file
-			if file.Exists(folder_path.."/sv_"..game_states..".lua", "GAME") then
-				include(include_path.."sv_"..game_states..".lua")
-				--print("included state file sv_"..game_states..".lua")
+			if file.Exists(folder_path.."/sv_"..game_state..".lua", "GAME") then
+				include(include_path.."sv_"..game_state..".lua")
+				--print("included state file sv_"..game_state..".lua")
 			end
 
 			-- include sh file
-			if file.Exists(folder_path.."/sh_"..game_states..".lua", "GAME") then
-				include(include_path.."sh_"..game_states..".lua")
+			if file.Exists(folder_path.."/sh_"..game_state..".lua", "GAME") then
+				include(include_path.."sh_"..game_state..".lua")
 			end
 		else
 			-- include cl and sh file
 			-- file.exist doesnt work for files sent by server, so fuck
 			-- gonna throw errors if they don't exist
-			include(include_path.."cl_"..game_states..".lua")
-			include(include_path.."sh_"..game_states..".lua")
+			include(include_path.."cl_"..game_state..".lua")
+			include(include_path.."sh_"..game_state..".lua")
 			--print("included client and shared files")
 		end
-	end
-
-	-- enter state #1
-	if SERVER then
-		states.switch_state(states.states[1])
 	end
 end
 
 -- only the server can switch gamestate
--- when the state is switched, a net message is broadcast to sync everyone to the same gamestate
 if SERVER then
 	function states.switch_state(new_state)
 		if new_state == CURRENT_STATE then return end
@@ -119,32 +112,34 @@ end
 -- initializes state hooks for a given state
 -- also cleans up all state hooks if clean is passed
 function states.update_state_hooks(clean)
-	-- this function is run both during setup and midgame, so try for both
+	-- this function is (should be) run both during setup and midgame, so try for both
 	local gm_table = GM or GAMEMODE
-	assert(gm_table, "gamemode table table is nil! (wtf?)")
+	assert(gm_table, "[states] gamemode table is nil (wtf?)")
 
 	local hook_table = states.get_hook_table(CURRENT_STATE)
 
 	if not hook_table then return end
 
 	for name,func in pairs(hook_table) do
-		local val = function(...)
-			local res
+		if clean then
+			gm_table[name] = nil
+		else
+			local hook_func = function(...)
+				local res
 
-			if original_gamemode_hooks[name] then
-				res = original_gamemode_hooks[name](...)
+				if original_gamemode_hooks[name] then
+					res = original_gamemode_hooks[name](...)
+
+					if res then return res end
+				end
+
+				res = func(...)
 
 				if res then return res end
 			end
 
-			res = func(...)
-
-			if res then return res end
+			gm_table[name] = hook_func
 		end
-
-		if clean then val = nil end
-
-		gm_table[name] = val
 	end
 end
 
@@ -163,7 +158,7 @@ function states.run_state_hook(name, ...)
 	local state_hook = states.get_state_hook(name)
 
 	local success, err = pcall(stat_hook, ...)
-	return assert(success, "state hook failed to run! ("..CURRENT_STATEs..","..name..")\n"..err)
+	return assert(success, "[states] state hook failed to run ("..CURRENT_STATE..","..name..")\n"..err)
 end
 
 function states.add_state_hook(game_state, name, func)
@@ -186,18 +181,18 @@ function states.handle_reload()
 end
 
 --[[
-	Statemachine syncing and shit
+	State syncing
 --]]
 
 if SERVER then
 	function states.sync_state()
-		net.Start("Statemachine_Stateswitch")
+		net.Start("States_Stateswitch")
 			net.WriteString(CURRENT_STATE)
 		net.Broadcast()
 	end
 
 	function states.sync_player(ply)
-		net.Start("Statemachine_Stateswitch")
+		net.Start("States_Stateswitch")
 			net.WriteString(CURRENT_STATE)
 		net.Send(ply)
 	end
@@ -218,4 +213,4 @@ local function sync_state()
 
 	states.update_state_hooks()
 end
-net.Receive("Statemachine_Stateswitch", sync_state)
+net.Receive("States_Stateswitch", sync_state)
