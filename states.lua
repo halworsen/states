@@ -33,7 +33,7 @@ end
 --]]
 
 function states.init()
-	local path = "gamemodes/"..engine.ActiveGamemode().."/gamemode/states"
+	local path = "gamemodes/"..GM.FolderName.."/gamemode/states"
 
 	local found_files, found_dirs = file.Find(path.."/*", "GAME")
 
