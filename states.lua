@@ -38,7 +38,7 @@ end
 function states.init()
 	local path = "gamemodes/"..engine.ActiveGamemode().."/gamemode/states"
 
-	local found_files, found_dirs = file.Find("*", path.."/")
+	local found_files, found_dirs = file.Find(path.."/*", "GAME")
 
 	for k,game_state in pairs(found_dirs) do
 		table.Add(states.states, game_state)
