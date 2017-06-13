@@ -1,14 +1,14 @@
-##states
+## states
 
 states is a statemachine for making garry's mod gamemodes that hopefully makes organizing the code a little easier
 
-##how does it work?
+## how does it work?
 
 when you switch between states the statemachine rewrites the gamemode hooks to use the hooks that are specific to the current gamestate. this way you can have multiple different gamemode hooks for different gamestates.
 
 so using this you could, for example, have a regular gamemode hook for scoreboard drawing that is used all the time, but a custom HUD paint for each individual gamestate
 
-##cool, how do i use this thing?
+## cool, how do i use this thing?
 
 first of all, addcslua and include states.lua in your gamemode. **make sure that states.lua is included after all includes which have gamemode function definitions in them**. you also want to initialize/load all the gamestates by calling ```states.init()```
 
