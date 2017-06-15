@@ -20,10 +20,10 @@ end
 --]]
 
 function states.init()
-	local original_gamemode_hooks = original_gamemode_hooks or {}
+	states.original_gamemode_hooks = states.original_gamemode_hooks or {}
 	for k,v in pairs(GM or GAMEMODE) do
 		if isfunction(v) then
-			original_gamemode_hooks[k] = v
+			states.original_gamemode_hooks[k] = v
 		end
 	end
 	
@@ -119,8 +119,8 @@ function states.update_state_hooks(clean)
 			local hook_func = function(...)
 				local res
 
-				if original_gamemode_hooks[name] then
-					res = original_gamemode_hooks[name](...)
+				if states.original_gamemode_hooks[name] then
+					res = states.original_gamemode_hooks[name](...)
 
 					if res then return res end
 				end
