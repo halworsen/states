@@ -50,7 +50,7 @@ function states.init()
 		local sh_exists = file.Exists(folder_path.."/sh_"..game_state..".lua", "LUA")
 
 		if SERVER then
-			assert(file.Exists(path, "LUA"), "[states] states folder doesn't exist")
+			assert(file.Exists(path, "LUA"), "states folder doesn't exist")
 
 			local sv_exists = file.Exists(folder_path.."/sv_"..game_state..".lua", "LUA")
 
@@ -116,7 +116,7 @@ end
 function states.update_state_hooks(clean)
 	-- this function is (should be) run both during setup and midgame, so try for both
 	local gm_table = GM or GAMEMODE
-	assert(gm_table, "[states] gamemode table is nil (wtf?)")
+	assert(gm_table, "gamemode table is nil (wtf?)")
 
 	local hook_table = states.get_hook_table(states.CURRENT_STATE)
 
@@ -160,7 +160,7 @@ function states.run_state_hook(name, ...)
 	local state_hook = states.get_state_hook(name)
 
 	local success, err = pcall(stat_hook, ...)
-	return assert(success, "[states] state hook failed to run ("..states.CURRENT_STATE..","..name..")\n"..err)
+	return assert(success, "state hook failed to run ("..states.CURRENT_STATE..","..name..")\n"..err)
 end
 
 function states.add_state_hook(game_state, name, func)
