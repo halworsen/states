@@ -4,7 +4,7 @@ states is a statemachine for making garry's mod gamemodes that hopefully makes o
 
 ## how does it work?
 
-when you switch between states the statemachine rewrites the gamemode hooks to use the hooks that are specific to the current gamestate. this way you can have multiple different gamemode hooks for different gamestates.
+when you switch between states the statemachine redefines the gamemode hooks to use the hooks that are specific to the current gamestate. this way you can have multiple different gamemode hooks for different gamestates. gamestate hooks are "second priority", meaning that if the original gamemode hook returns a value, the gamestate hook for that hook won't run.
 
 so using this you could, for example, have a regular gamemode hook for scoreboard drawing that is used all the time, but a custom HUD paint for each individual gamestate
 
