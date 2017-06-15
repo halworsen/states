@@ -1,27 +1,14 @@
 --[[
-	SMERT(tm) statemachine for gamemodes and shit that follow a pregame>game>endgame progression
+	states
+	https://github.com/Atebite/states
 
-	state is changed via a function
-	on enter or exit, a hook is called for that state
-
-	statemachine first calls gamemode hooks (GM:houk), then the state hook
-
-	important:
-	the StateEntered hook is called on autorefresh
+	statemachine for garry's mod gamemodes
 --]]
 
 states = states or {}
 
-local original_gamemode_hooks = original_gamemode_hooks or {}
-for k,v in pairs(GM or GAMEMODE) do
-	if isfunction(v) then
-		original_gamemode_hooks[k] = v
-	end
-end
-
 states.states = {}
 states.CURRENT_STATE = states.CURRENT_STATE or ""
-
 states.hooks = states.hooks or {}
 
 if SERVER then
@@ -33,6 +20,13 @@ end
 --]]
 
 function states.init()
+	local original_gamemode_hooks = original_gamemode_hooks or {}
+	for k,v in pairs(GM or GAMEMODE) do
+		if isfunction(v) then
+			original_gamemode_hooks[k] = v
+		end
+	end
+	
 	local path = GM.FolderName.."/gamemode/states"
 
 	local found_files, found_dirs = file.Find(path.."/*", "LUA")
@@ -58,19 +52,16 @@ function states.init()
 			if sh_exists then
 				AddCSLuaFile(include_path.."sh_"..game_state..".lua")
 				include(include_path.."sh_"..game_state..".lua")
-				--print("added state file sh_"..game_state..".lua to client")
 			end
 			
 			-- add client file for clients
 			if cl_exists then
 				AddCSLuaFile(include_path.."cl_"..game_state..".lua")
-				--print("added state file cl_"..game_state..".lua to client")
 			end
 
 			-- include sv file
 			if sv_exists then
 				include(include_path.."sv_"..game_state..".lua")
-				--print("included state file sv_"..game_state..".lua")
 			end
 		else
 			-- include client files
@@ -81,7 +72,6 @@ function states.init()
 			if sh_exists then
 				include(include_path.."sh_"..game_state..".lua")
 			end
-			--print("included client and shared files")
 		end
 	end
 end
