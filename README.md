@@ -10,9 +10,11 @@ so using this you could, for example, have a regular gamemode hook for scoreboar
 
 ## cool, how do i use this thing?
 
-first of all, addcslua and include states.lua in your gamemode. **make sure that states.lua is included after all includes which have gamemode function definitions in them**. you also want to initialize/load all the gamestates by calling ```states.init()```
+first of all, drop states.lua in your root gamemode folder (gamemodes/yourgamemode/gamemode/)
 
-now make a folder called "states" in your root gamemode folder. inside that folder, create even more folders and start naming them by your gamestates. the folder names are what you'll be using in your code to refer to the gamestates. inside each gamestate folder, create cl_*statename*.lua, sh_*statename*.lua and sv_*statename*.lua for the gamestate.
+in your code, start by ```AddCSLua```-ing and ```include```-ing states.lua in your gamemode. you also want to initialize/load all the gamestates by calling ```states.init()``` **make sure you call ```states.init``` after all gamemode function definitions, as states caches the original gamemode hooks.**
+
+now make a folder called "states" in your root gamemode folder. inside that folder, create even more folders and start naming them by your gamestates. the folder names are what you'll be using in your code to refer to the gamestates. inside each gamestate folder, create cl_*statename*.lua, sh_*statename*.lua and sv_*statename*.lua as needed for your gamestate.
 
 start writing your code in those gamestate files. however, instead of writing gamemode functions (function GM:something() ... end) you write "normal" hooks, i.e. just normal functions that are hooked into the gamemode hooks, literally exactly the same as in the ```hook``` library. instead of using ```hook.Add```, you use ```states.add_state_hook(game_state, hook_name, hook_func)```
 

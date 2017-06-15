@@ -33,9 +33,9 @@ end
 --]]
 
 function states.init()
-	local path = "gamemodes/"..GM.FolderName.."/gamemode/states"
+	local path = GM.FolderName.."/gamemode/states"
 
-	local found_files, found_dirs = file.Find(path.."/*", "GAME")
+	local found_files, found_dirs = file.Find(path.."/*", "LUA")
 
 	for k,game_state in pairs(found_dirs) do
 		table.Add(states.states, game_state)
@@ -46,38 +46,41 @@ function states.init()
 		-- because this is called from the gamemode init files, the include will be relative to the "root" gamemode folder
 		local include_path = "states/"..game_state.."/"
 
-		if SERVER then
-			assert(file.Exists(path, "GAME"), "[states] states folder doesn't exist")
-			assert(file.Exists(folder_path, "GAME"), "[states] folder for gamestate "..game_state.." doesn't exist")
+		local cl_exists = file.Exists(folder_path.."/cl_"..game_state..".lua", "LUA")
+		local sh_exists = file.Exists(folder_path.."/sh_"..game_state..".lua", "LUA")
 
-			-- add shared file for clients
-			if file.Exists(folder_path.."/sh_"..game_state..".lua", "GAME") then
+		if SERVER then
+			assert(file.Exists(path, "LUA"), "[states] states folder doesn't exist")
+
+			local sv_exists = file.Exists(folder_path.."/sv_"..game_state..".lua", "LUA")
+
+			-- add shared file for clients and include
+			if sh_exists then
 				AddCSLuaFile(include_path.."sh_"..game_state..".lua")
+				include(include_path.."sh_"..game_state..".lua")
 				--print("added state file sh_"..game_state..".lua to client")
 			end
 			
 			-- add client file for clients
-			if file.Exists(folder_path.."/cl_"..game_state..".lua", "GAME") then
+			if cl_exists then
 				AddCSLuaFile(include_path.."cl_"..game_state..".lua")
 				--print("added state file cl_"..game_state..".lua to client")
 			end
 
 			-- include sv file
-			if file.Exists(folder_path.."/sv_"..game_state..".lua", "GAME") then
+			if sv_exists then
 				include(include_path.."sv_"..game_state..".lua")
 				--print("included state file sv_"..game_state..".lua")
 			end
+		else
+			-- include client files
+			if cl_exists then
+				include(include_path.."cl_"..game_state..".lua")
+			end
 
-			-- include sh file
-			if file.Exists(folder_path.."/sh_"..game_state..".lua", "GAME") then
+			if sh_exists then
 				include(include_path.."sh_"..game_state..".lua")
 			end
-		else
-			-- include cl and sh file
-			-- file.exist doesnt work for files sent by server, so fuck
-			-- gonna throw errors if they don't exist
-			include(include_path.."cl_"..game_state..".lua")
-			include(include_path.."sh_"..game_state..".lua")
 			--print("included client and shared files")
 		end
 	end
