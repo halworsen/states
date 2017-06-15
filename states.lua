@@ -20,7 +20,7 @@ for k,v in pairs(GM or GAMEMODE) do
 end
 
 states.states = {}
-CURRENT_STATE = CURRENT_STATE or ""
+states.CURRENT_STATE = states.CURRENT_STATE or ""
 
 states.hooks = states.hooks or {}
 
@@ -86,9 +86,9 @@ end
 -- only the server can switch gamestate
 if SERVER then
 	function states.switch_state(new_state)
-		if new_state == CURRENT_STATE then return end
+		if new_state == states.CURRENT_STATE then return end
 
-		local old_state = CURRENT_STATE
+		local old_state = states.CURRENT_STATE
 
 		hook.Call("StateExit_"..old_state)
 
@@ -97,7 +97,7 @@ if SERVER then
 		hook.Call("StateSwitch", nil, old_state, new_state)
 		hook.Call("StateEnter_"..new_state)
 
-		CURRENT_STATE = new_state
+		states.CURRENT_STATE = new_state
 
 		states.update_state_hooks()
 		states.sync_state()
@@ -115,7 +115,7 @@ function states.update_state_hooks(clean)
 	local gm_table = GM or GAMEMODE
 	assert(gm_table, "[states] gamemode table is nil (wtf?)")
 
-	local hook_table = states.get_hook_table(CURRENT_STATE)
+	local hook_table = states.get_hook_table(states.CURRENT_STATE)
 
 	if not hook_table then return end
 
@@ -157,7 +157,7 @@ function states.run_state_hook(name, ...)
 	local state_hook = states.get_state_hook(name)
 
 	local success, err = pcall(stat_hook, ...)
-	return assert(success, "[states] state hook failed to run ("..CURRENT_STATE..","..name..")\n"..err)
+	return assert(success, "[states] state hook failed to run ("..states.CURRENT_STATE..","..name..")\n"..err)
 end
 
 function states.add_state_hook(game_state, name, func)
@@ -175,7 +175,7 @@ end
 -- called on autorefresh/reload
 function states.handle_reload()
 	states.update_state_hooks(true)
-	hook.Call("StateEnter_"..CURRENT_STATE)
+	hook.Call("StateEnter_"..states.CURRENT_STATE)
 	states.update_state_hooks()
 end
 
@@ -186,13 +186,13 @@ end
 if SERVER then
 	function states.sync_state()
 		net.Start("States_Stateswitch")
-			net.WriteString(CURRENT_STATE)
+			net.WriteString(states.CURRENT_STATE)
 		net.Broadcast()
 	end
 
 	function states.sync_player(ply)
 		net.Start("States_Stateswitch")
-			net.WriteString(CURRENT_STATE)
+			net.WriteString(states.CURRENT_STATE)
 		net.Send(ply)
 	end
 
@@ -201,7 +201,7 @@ if SERVER then
 end
 
 local function sync_state()
-	local old_state = CURRENT_STATE
+	local old_state = states.CURRENT_STATE
 	local new_state = net.ReadString()
 
 	hook.Call("StateExit_"..old_state)
@@ -211,7 +211,7 @@ local function sync_state()
 	hook.Call("StateSwitch", nil, old_state, new_state)
 	hook.Call("StateEnter_"..new_state)
 
-	CURRENT_STATE = new_state
+	states.CURRENT_STATE = new_state
 
 	states.update_state_hooks()
 end
