@@ -2,6 +2,8 @@
 
 states is a statemachine for making garry's mod gamemodes that hopefully makes organizing the code a little easier
 
+see an example of how to use states ![here](https://github.com/Atebite/barebase)
+
 ## how does it work?
 
 when you switch between states the statemachine redefines the gamemode hooks to use the hooks that are specific to the current gamestate. this way you can have multiple different gamemode hooks for different gamestates.
