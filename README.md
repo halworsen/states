@@ -20,20 +20,6 @@ start writing your code in those gamestate files. however, instead of writing ga
 
 to switch between gamestates, use ```states.switch_state(new_state)```. you want to use this when initializing the gamemode, too, as states doesn't set a gamestate inside the ```init``` function.
 
-other than that, you want to add ```states.handle_reload()``` to your GM:OnReloaded function so that states can tackle JIT reloads properly
-```lua
-function GM:OnReloaded()
-	states.handle_reload()
-end
-```
-
-```states.sync_player(ply)``` also needs to be added to GM:PlayerInitialSpawn to sync new players
-```lua
-function GM:PlayerInitialSpawn(ply)
-	states.sync_player(ply)
-end
-```
-
 ## anything else?
 
 states adds "3" new regular hooks:

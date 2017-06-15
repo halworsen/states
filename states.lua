@@ -181,6 +181,7 @@ function states.handle_reload()
 	hook.Call("StateEnter_"..states.CURRENT_STATE)
 	states.update_state_hooks()
 end
+hook.Add("OnReloaded", "StatesHandleReload", states.handle_reload)
 
 --[[
 	State syncing
