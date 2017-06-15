@@ -4,7 +4,9 @@ states is a statemachine for making garry's mod gamemodes that hopefully makes o
 
 ## how does it work?
 
-when you switch between states the statemachine redefines the gamemode hooks to use the hooks that are specific to the current gamestate. this way you can have multiple different gamemode hooks for different gamestates. gamestate hooks are "second priority", meaning that if the original gamemode hook returns a value, the gamestate hook for that hook won't run.
+when you switch between states the statemachine redefines the gamemode hooks to use the hooks that are specific to the current gamestate. this way you can have multiple different gamemode hooks for different gamestates.
+
+gamestate hooks are "second priority", meaning that if the original gamemode hook returns a value, the gamestate hook for that hook won't run.
 
 so using this you could, for example, have a regular gamemode hook for scoreboard drawing that is used all the time, but a custom HUD paint for each individual gamestate
 
@@ -13,46 +15,63 @@ so using this you could, for example, have a regular gamemode hook for scoreboar
 first, drop states.lua in your root gamemode folder
 
 in your gamemode's init.lua file, do this:
-	```
-	AddCSLua("states.lua")
 
-	states.switch_state("initialstate")
-	```
+```lua
+AddCSLua("states.lua")
+
+states.switch_state("initialstate")
+```
+
 
 in your gamemode's shared.lua file, do this:
-	```
-	include("states.lua")
 
-	states.init()
-	```
+```lua
+include("states.lua")
+
+states.init()
+```
 **make sure you call states.init() after you've defined all the game*mode* hooks, as they are cached by states when you initialize it**
 
-write your code in the respective gamestate files. hook the code by using states.add_state_hook(game_state, name, func)
-	e.g.
-	```
-	local function HUDPaint()
-		...
-	end
-	states.add_state_hook("pregame", "HUDPaint", HUDPaint)
-	```
 
-switch between gamestates using ```states.switch_state(new_state)```
+write your code in the respective gamestate files. hook the code by using states.add_state_hook(game_state, name, func)
+
+e.g.
+```lua
+local function HUDPaint()
+	...
+end
+states.add_state_hook("pregame", "HUDPaint", HUDPaint)
+```
+
+
+switch between gamestates using `states.switch_state(new_state)`
 
 ## how's the folder structure?
 
 states.lua needs to be in your root gamemode folder
-	i.e. gamemodes/yourgamemode/gamemode/states.lua
+
+i.e.
+`gamemodes/yourgamemode/gamemode/states.lua`
+
 
 the "states" folder needs to be inside the root gamemode folder along with states.lua
-	i.e. gamemodes/yourgamemode/gamemode/states
+
+i.e.
+`gamemodes/yourgamemode/gamemode/states`
+
 
 inside states, put your gamestate folders with their respective files
-	e.g. gamemodes/yourgamemode/gamemode/states/pregame/cl_pregame.lua
-		 gamemodes/yourgamemode/gamemode/states/pregame/sv_pregame.lua
 
-		 gamemodes/yourgamemode/gamemode/states/endgame/cl_endgame.lua
-		 gamemodes/yourgamemode/gamemode/states/endgame/sh_endgame.lua
-		 gamemodes/yourgamemode/gamemode/states/endgame/sv_endgame.lua
+e.g.
+```
+gamemodes/yourgamemode/gamemode/states/pregame/cl_pregame.lua
+gamemodes/yourgamemode/gamemode/states/pregame/sv_pregame.lua
+
+
+gamemodes/yourgamemode/gamemode/states/endgame/cl_endgame.lua
+gamemodes/yourgamemode/gamemode/states/endgame/sh_endgame.lua
+gamemodes/yourgamemode/gamemode/states/endgame/sv_endgame.lua
+```
 
 ## anything else?
 
