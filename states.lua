@@ -195,6 +195,9 @@ if SERVER then
 			net.WriteString(CURRENT_STATE)
 		net.Send(ply)
 	end
+
+	-- sync new players
+	hook.Add("PlayerInitialSpawn", "StatesSyncNewPlayer", states.sync_player)
 end
 
 local function sync_state()
