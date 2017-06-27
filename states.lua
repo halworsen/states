@@ -86,13 +86,12 @@ if SERVER then
 		hook.Call("StateExit_"..old_state)
 
 		states.update_state_hooks(true)
-
 		hook.Call("StateSwitch", nil, old_state, new_state)
+		states.CURRENT_STATE = new_state
+		states.update_state_hooks()
+
 		hook.Call("StateEnter_"..new_state)
 
-		states.CURRENT_STATE = new_state
-
-		states.update_state_hooks()
 		states.sync_state()
 	end
 end
@@ -201,12 +200,10 @@ local function sync_state()
 	hook.Call("StateExit_"..old_state)
 
 	states.update_state_hooks(true)
-
 	hook.Call("StateSwitch", nil, old_state, new_state)
-	hook.Call("StateEnter_"..new_state)
-
 	states.CURRENT_STATE = new_state
-
 	states.update_state_hooks()
+
+	hook.Call("StateEnter_"..new_state)
 end
 net.Receive("States_Stateswitch", sync_state)
