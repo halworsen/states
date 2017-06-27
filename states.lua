@@ -21,10 +21,12 @@ end
 
 function states.init()
 	states.original_gamemode_hooks = states.original_gamemode_hooks or {}
+	if #states.original_gamemode_hooks == 0 then
 	for k,v in pairs(GM or GAMEMODE) do
 		if isfunction(v) then
 			states.original_gamemode_hooks[k] = v
 		end
+	end
 	end
 	
 	local gmt = GM or GAMEMODE
