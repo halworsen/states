@@ -22,11 +22,11 @@ end
 function states.init()
 	states.original_gamemode_hooks = states.original_gamemode_hooks or {}
 	if #states.original_gamemode_hooks == 0 then
-	for k,v in pairs(GM or GAMEMODE) do
-		if isfunction(v) then
-			states.original_gamemode_hooks[k] = v
+		for k,v in pairs(GM or GAMEMODE) do
+			if isfunction(v) then
+				states.original_gamemode_hooks[k] = v
+			end
 		end
-	end
 	end
 	
 	local gmt = GM or GAMEMODE
@@ -114,26 +114,30 @@ function states.update_state_hooks(clean)
 
 	if not hook_table then return end
 
+	if clean then
+		for name,func in pairs(states.original_gamemode_hooks) do
+			gm_table[name] = states.original_gamemode_hooks[name]
+		end
+		
+		return
+	end
+
 	for name,func in pairs(hook_table) do
-		if clean then
-			gm_table[name] = nil
-		else
-			local hook_func = function(...)
-				local res
+		local hook_func = function(...)
+			local res
 
-				if states.original_gamemode_hooks[name] then
-					res = states.original_gamemode_hooks[name](...)
-
-					if res then return res end
-				end
-
-				res = func(...)
+			if states.original_gamemode_hooks[name] then
+				res = states.original_gamemode_hooks[name](...)
 
 				if res then return res end
 			end
 
-			gm_table[name] = hook_func
+			res = func(...)
+
+			if res then return res end
 		end
+
+		gm_table[name] = hook_func
 	end
 end
 
