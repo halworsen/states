@@ -27,7 +27,8 @@ function states.init()
 		end
 	end
 	
-	local path = GM.FolderName.."/gamemode/states"
+	local gmt = GM or GAMEMODE
+	local path = gmt.FolderName.."/gamemode/states"
 
 	local found_files, found_dirs = file.Find(path.."/*", "LUA")
 
