@@ -53,27 +53,27 @@ function states.init()
 
 			-- add shared file for clients and include
 			if sh_exists then
-				AddCSLuaFile(include_path.."sh_"..game_state..".lua")
-				include(include_path.."sh_"..game_state..".lua")
+				AddCSLuaFile(folder_path.."/sh_"..game_state..".lua")
+				include(folder_path.."/sh_"..game_state..".lua")
 			end
 			
 			-- add client file for clients
 			if cl_exists then
-				AddCSLuaFile(include_path.."cl_"..game_state..".lua")
+				AddCSLuaFile(folder_path.."/cl_"..game_state..".lua")
 			end
 
 			-- include sv file
 			if sv_exists then
-				include(include_path.."sv_"..game_state..".lua")
+				include(folder_path.."/sv_"..game_state..".lua")
 			end
 		else
 			-- include client files
 			if cl_exists then
-				include(include_path.."cl_"..game_state..".lua")
+				include(folder_path.."/cl_"..game_state..".lua")
 			end
 
 			if sh_exists then
-				include(include_path.."sh_"..game_state..".lua")
+				include(folder_path.."/sh_"..game_state..".lua")
 			end
 		end
 	end
